@@ -87,7 +87,6 @@ PyInstaller==3.6
 pymssql==2.1.4
 PyMySQL==0.9.3
 pyparsing==2.4.7
-PyQt4 @ file:///D:/PyQt4-4.11.4-cp37-cp37m-win_amd64.whl
 PyQt5-sip==12.8.0
 PyQt5-stubs==5.14.2.2
 pyreadline==2.1
