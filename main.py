@@ -10,7 +10,7 @@ try:
     from urllib import unquote
 except ImportError:
     from urllib.parse import unquote
-    
+
 
 app = Bottle(__name__)
 debug(False)
@@ -23,6 +23,20 @@ def index():
             "developer_organization":"Datamate Web Solutions"}
     return (data)
 
+@app.post('/')
+def index():
+
+    print("-------------------------------------------------- POST INDEX ---------------------------------------------------------------");
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> POST " + post);
+    try :
+        _data = unquote(request.body.read().decode('utf-8'));
+        #_data = json.load(_data);
+        print(_data);
+    except Exception as identifier:
+        print("post Error : " + str(identifier));
+    
+    
+    print("------------------------------------------------------------------------------------------------------------------------\n");
 
 @app.post('/<post>')
 def index(post):
