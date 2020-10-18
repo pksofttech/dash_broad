@@ -36,7 +36,6 @@ def index():
     except Exception as identifier:
         print("post Error : " + str(identifier));
     
-    
     print("------------------------------------------------------------------------------------------------------------------------\n");
     return("POST OK")
 
