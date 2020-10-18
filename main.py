@@ -2,8 +2,8 @@
 from bottle import Bottle, run, template, debug, static_file
 from bottle import get, post, request, response
 
-from bottle.ext.websocket import GeventWebSocketServer
-from bottle.ext.websocket import websocket
+#from bottle.ext.websocket import GeventWebSocketServer
+#from bottle.ext.websocket import websocket
 
 import os, sys, socket
 
