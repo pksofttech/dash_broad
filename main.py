@@ -27,7 +27,6 @@ def index():
 def index():
 
     print("-------------------------------------------------- POST INDEX ---------------------------------------------------------------");
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> POST " + post);
     try :
         _data = unquote(request.body.read().decode('utf-8'));
         #_data = json.load(_data);
