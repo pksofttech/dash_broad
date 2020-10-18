@@ -25,4 +25,5 @@ def index():
 
 import os
 if __name__ == "__main__":
+    print(os.name);
     app.run(host='0.0.0.0',port=os.environ['PORT'])
