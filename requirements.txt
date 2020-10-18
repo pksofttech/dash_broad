@@ -1,3 +1,2 @@
-boltons==19.3.0
-bottle==0.12.18
+line-bot-sdk
 flask
