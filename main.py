@@ -12,6 +12,13 @@ try:
 except ImportError:
     from urllib.parse import unquote
 
+from linebot import LineBotApi
+from linebot.models import TextSendMessage
+from linebot.exceptions import LineBotApiError
+
+#line_bot_api = LineBotApi('43398846c9d56769235d6876bb879bba')
+#handler = WebhookHandler('1653361761')
+line_bot_api = LineBotApi('43398846c9d56769235d6876bb879bba')
 
 app = Bottle(__name__)
 debug(False)
@@ -37,6 +44,10 @@ def index():
         print("post Error : " + str(identifier));
     
     print("------------------------------------------------------------------------------------------------------------------------\n");
+    try:
+        line_bot_api.reply_message('43398846c9d56769235d6876bb879bba', TextSendMessage(text='Hello World!'))
+    except LineBotApiError as e:
+        print(e)
     return("POST OK")
 
 @app.post('/<post>')
