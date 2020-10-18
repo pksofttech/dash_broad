@@ -16,7 +16,7 @@ except ImportError:
 app = Bottle(__name__)
 debug(False)
 
-import pprint
+from pprint import pprint
 
 
 @app.route('/')
@@ -32,7 +32,7 @@ def index():
     try :
         _data = unquote(request.body.read().decode('utf-8'));
         #_data = json.load(_data);
-        pprint(_data,index=2);
+        pprint(_data);
     except Exception as identifier:
         print("post Error : " + str(identifier));
     
