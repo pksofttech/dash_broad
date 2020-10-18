@@ -37,6 +37,7 @@ def handle_message(event):
         TextSendMessage(text=event.message.text))
 
 
+import os
 if __name__ == "__main__":
-    print("Start")
-    app.run()
+    print(os.name);
+    app.run(host='0.0.0.0',port=os.environ['PORT'])
