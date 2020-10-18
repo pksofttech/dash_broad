@@ -6,7 +6,11 @@ from bottle import get, post, request, response
 #from bottle.ext.websocket import websocket
 
 import os, sys, socket
-
+try:
+    from urllib import unquote
+except ImportError:
+    from urllib.parse import unquote
+    
 
 app = Bottle(__name__)
 debug(False)
