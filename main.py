@@ -32,7 +32,7 @@ def index():
     try :
         _data = unquote(request.body.read().decode('utf-8'));
         #_data = json.load(_data);
-        pprint(_data);
+        pprint(_data,indent=2);
     except Exception as identifier:
         print("post Error : " + str(identifier));
     
