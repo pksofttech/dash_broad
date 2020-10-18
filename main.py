@@ -41,7 +41,8 @@ def index():
         #_data = json.load(_data);
         pprint(_data,indent=2);
         rey_tk = _data["events"]["replyToken"]
-        line_bot_api.reply_message(rey_tk, TextSendMessage(text='Hello World!'))
+        print(rey_tk);
+        line_bot_api.reply_message(str(rey_tk), TextSendMessage(text='Hello World!'))
     except Exception as identifier:
         print("post Error : " + str(identifier));
     
