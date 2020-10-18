@@ -40,14 +40,14 @@ def index():
         _data = unquote(request.body.read().decode('utf-8'));
         #_data = json.load(_data);
         pprint(_data,indent=2);
+        rey_tk = _data["events"]["replyToken"]
+        line_bot_api.reply_message(rey_tk, TextSendMessage(text='Hello World!'))
     except Exception as identifier:
         print("post Error : " + str(identifier));
     
     print("------------------------------------------------------------------------------------------------------------------------\n");
-    try:
-        line_bot_api.reply_message('1653361761', TextSendMessage(text='Hello World!'))
-    except LineBotApiError as e:
-        print(e)
+    
+
     return("POST OK")
 
 @app.post('/<post>')
