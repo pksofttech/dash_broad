@@ -1,4 +1,5 @@
 
+from sys import intern
 from bottle import Bottle, run, template, debug, static_file
 from bottle import get, post, request, response
 
@@ -15,6 +16,7 @@ except ImportError:
 app = Bottle(__name__)
 debug(False)
 
+import pprint
 
 
 @app.route('/')
@@ -30,7 +32,7 @@ def index():
     try :
         _data = unquote(request.body.read().decode('utf-8'));
         #_data = json.load(_data);
-        print(_data);
+        pprint(_data,index=2);
     except Exception as identifier:
         print("post Error : " + str(identifier));
     
