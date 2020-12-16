@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <title>SocketIO example</title>
+      <script src="/static/js/jquery-3.5.1.min.js"></script>
+      <script src="/static/js/socket.io.js"></script>
+      <script src="/static/js/socket.io.msgpack.min.js"></script>
+      
+      <script type="text/javascript" charset="utf-8">
+         $(document).ready(function() {
+         
+           // sending a connect request to the server.
+           //var socket = io.connect('http://{{host}}:{{port}}');
+           var socket = io.connect('http://' + document.domain + ':' + location.port);
+           socket.on('connect', function(msg) {
+               console.log('After connect', msg);
+               document.getElementById("log").innerHTML = msg;
+               //$('#log').attribute.value = msg.data;
+          });      
+         });
+      </script>
+   </head>
+   <body>
+    <h1>SocketIO Example</h1>
+    <h2>Receive:</h2>
+    <div id="log"></div>
+    <div id="log0"></div>
+   </body>
+</html>

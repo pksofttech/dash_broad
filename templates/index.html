@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Datalogger - DLS@2020 dev</title>
+    <link rel="icon" type="image/png" href="/favicon.ico" />
+    <!-- Custom fonts for this template-->
+    <link href="/static/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="/static/css/sb-admin-2.min.css" rel="stylesheet">
+    <script src="/static/js/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.1/socket.io.js" integrity="sha512-AcZyhRP/tbAEsXCCGlziPun5iFvcSUpEz2jKkx0blkYKbxU81F+iq8FURwPn1sYFeksJ+sDDrI5XujsqSobWdQ==" crossorigin="anonymous"></script>
+
+    <script src="/static/Chart_JS/Chart.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+            // sending a connect request to the server.
+            var socket = io.connect();
+
+            socket.on('connect', function(msg) {
+                console.log('After connect', msg);
+                document.getElementById("info").innerHTML = msg;
+            });
+            socket.on('update', function(msg) {
+                console.log('log_Msg_Update', msg);
+                var res = msg.split("=");
+                document.getElementById(res[0]).innerHTML = res[1];
+                if (msg === "status=Hopper Low Level Detected") {
+                    document.getElementById("status").innerHTML = "Hopper Low Level Detected";
+                    console.log('log_status', msg);
+                    document.getElementById("coin_empy_Audio").play();
+                }
+                if (msg === "status=Coin Changer.Ready") {
+                    document.getElementById("status").innerHTML = "Coin Changer.Ready";
+                    console.log('log_status', msg);
+                    document.getElementById("coin_ready_Audio").play();
+                }
+            });
+            socket.on('log_table', function(msg) {
+                var table = document.getElementById("log_table");
+                var row = table.insertRow(1);
+                var cell1 = row.insertCell(0);
+                var cell2 = row.insertCell(1);
+                var cell3 = row.insertCell(2);
+                console.log('log_table', msg);
+                var res = msg.split(",");
+                cell1.innerHTML = res[0];
+                cell2.innerHTML = res[1];
+                cell3.innerHTML = res[2];
+                document.getElementById("total_rows").innerHTML = res[0] + " รายการ"
+            });
+            socket.on('gate_01', function(msg) {
+                console.log('log_Gate_01', msg);
+                document.getElementById("gate_01").innerHTML = msg;
+            });
+            socket.on('gate_02', function(msg) {
+                console.log('log_Gate_02', msg);
+                document.getElementById("gate_02").innerHTML = msg;
+            });
+            socket.on('status', function(msg) {
+                document.getElementById("status").innerHTML = msg;
+                console.log('log_status', msg);
+                document.getElementById("myAudio").play();
+
+
+            });
+            socket.on('info', function(msg) {
+                document.getElementById("info").innerHTML = msg;
+            });
+        });
+    </script>
+</head>
+
+<body id="page-top">
+    <audio id="coin_empy_Audio">
+        <source src="/static/coin_empy.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <audio id="coin_ready_Audio">
+        <source src="/static/coin_ready.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
+                <div class="sidebar-brand-icon rotate-n-15">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">Datalogger<sup>V1.05 Dev</sup></div>
+            </a>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item active">
+                <a class="nav-link" href="#">
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>Data</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Interface
+            </div>
+
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Setting</span>
+                </a>
+                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">System Config:</h6>
+                        <a class="collapse-item" href="#" data-toggle="modal" data-target="#config_model">Config System</a>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Nav Item - Utilities Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities" aria-expanded="true" aria-controls="collapseUtilities">
+                    <i class="fas fa-fw fa-wrench"></i>
+                    <span>Utilities</span>
+                </a>
+                <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Custom Utilities:</h6>
+                        <a class="collapse-item">Other</a>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Report
+            </div>
+
+            <!-- Nav Item - Pages Collapse Menu -->
+            <!--
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
+                    aria-expanded="true" aria-controls="collapsePages">
+                    <i class="fas fa-fw fa-folder"></i>
+                    <span>Pages</span>
+                </a>
+                <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Login Screens:</h6>
+                        <a class="collapse-item" href="login.html">Login</a>
+                        <a class="collapse-item" href="register.html">Register</a>
+                        <a class="collapse-item" href="forgot-password.html">Forgot Password</a>
+                        <div class="collapse-divider"></div>
+                        <h6 class="collapse-header">Other Pages:</h6>
+                        <a class="collapse-item" href="404.html">404 Page</a>
+                        <a class="collapse-item" href="blank.html">Blank Page</a>
+                    </div>
+                </div>
+            </li>
+        -->
+
+            <!-- Nav Item - Tables -->
+            <li class="nav-item">
+                <a class="nav-link" href="/tables">
+                    <i class="fas fa-fw fa-table"></i>
+                    <span>Tables</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <!-- Sidebar Toggler (Sidebar) -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+
+            <!-- Sidebar Message -->
+            <div class="sidebar-card">
+                <img class="sidebar-card-illustration mb-2" src="/static/img/undraw_rocket.svg" alt="">
+                <p class="text-center mb-2"><strong>data logger</strong> ข้อมูล</p>
+                <a class="btn btn-success btn-sm" href="http://www.dollysolutions.com/">Link to DLS</a>
+            </div>
+
+        </ul>
+        <!-- End of Sidebar -->
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <!-- Topbar Search -->
+                    <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                        <div class="input-group">
+                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button">
+                                    <i class="fas fa-search fa-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+
+                        <!-- Nav Item - Search Dropdown (Visible Only XS) -->
+                        <li class="nav-item dropdown no-arrow d-sm-none">
+                            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-search fa-fw"></i>
+                            </a>
+                            <!-- Dropdown - Messages -->
+                            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in" aria-labelledby="searchDropdown">
+                                <form class="form-inline mr-auto w-100 navbar-search">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="button">
+                                                <i class="fas fa-search fa-sm"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </li>
+
+                        <!-- Nav Item - Alerts -->
+                        <li class="nav-item dropdown no-arrow mx-1">
+                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-bell fa-fw"></i>
+                                <!-- Counter - Alerts -->
+                                <span class="badge badge-danger badge-counter">{{alert_msg}}</span>
+                            </a>
+                            <!-- Dropdown - Alerts -->
+                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
+                                <h6 class="dropdown-header">
+                                    Alerts Center
+                                </h6>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="mr-3">
+                                        <div class="icon-circle bg-primary">
+                                            <i class="fas fa-file-alt text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="small text-gray-500">For Pro Version</div>
+                                        <span class="font-weight-bold">ไม่มีรายการแจ้งเตือน!</span>
+                                    </div>
+                                </a>
+                                <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
+                            </div>
+                        </li>
+
+                        <!-- Nav Item - Messages -->
+                        <li class="nav-item dropdown no-arrow mx-1">
+                            <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-envelope fa-fw"></i>
+                                <!-- Counter - Messages -->
+                                <span class="badge badge-danger badge-counter">1</span>
+                            </a>
+                            <!-- Dropdown - Messages -->
+                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="messagesDropdown">
+                                <h6 class="dropdown-header">
+                                    Message Center
+                                </h6>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="dropdown-list-image mr-3">
+                                        <img class="rounded-circle" src="/static/img/undraw_profile_2.svg" alt="">
+                                        <div class="status-indicator"></div>
+                                    </div>
+                                    <div>
+                                        <div class="text-truncate">System User</div>
+                                        <div class="small text-gray-500">Log Sys ready</div>
+                                    </div>
+                                </a>
+
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="dropdown-list-image mr-3">
+                                        <img class="rounded-circle" src="/static/img/undraw_profile_1.svg" alt="">
+                                        <div class="status-indicator bg-success"></div>
+                                    </div>
+                                    <div>
+                                        <div class="text-truncate">Report User</div>
+                                        <div class="small text-gray-500">On line</div>
+                                    </div>
+                                </a>
+                                <a class="dropdown-item text-center small text-gray-500" href="#">Read More Messages</a>
+                            </div>
+                        </li>
+
+                        <div class="topbar-divider d-none d-sm-block"></div>
+
+                        <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">data logger</span>
+                                <img class="img-profile rounded-circle" src="/static/img/undraw_profile.svg">
+                            </a>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i> Profile
+                                </a>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i> Settings
+                                </a>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i> Activity Log
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> Logout
+                                </a>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </nav>
+                <!-- End of Topbar -->
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+                    <!-- Content Row -->
+                    <div class="row">
+
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                ยอดรวม GATE 01</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="gate_01">{{gate_01}}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                ยอดรวม GATE 02</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="gate_02">{{gate_02}}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-info shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">สถานะเครื่องแลกเหร๊ยญ
+                                            </div>
+                                            <div class="row no-gutters align-items-center">
+
+                                                <div class="col">
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="status">{{status}}</div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pending Requests Card Example -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-warning shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                Info...</div>
+                                            <div class="h7 mb-0 font-weight-bold text-gray-800" id="info">No msg...</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-comments fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content Row -->
+                    <div class="row">
+
+                        <!-- Content Column -->
+                        <div class="col-lg-8 mb-4">
+                            <!-- Project Card Example -->
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <button class="btn btn-info btn-sm" id="downloadExcel">
+                                        <span class="spinner-border spinner-border-sm"></span>
+                                        Export to Excel
+                                      </button>
+                                    <a href="/tables" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                                        <i class="fas fa-download fa-sm text-white-50"></i> Generate Row Data
+                                    </a>
+                                    <h5 class="float-right" id="total_rows">{{t_gate}} รายการ</h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="line-chart" width="800" height="450"></canvas>
+
+                                    <h4 class="small font-weight-bold"> data <span class="float-right">Complete!</span></h4>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <br>
+                                    <form action="/main" method="POST">
+                                        <div class="row">
+                                            <input type="datetime-local" class="col-lg-5 mb-4" name="date_start" value="{{date_start}}">
+                                            <div class="col-lg-2 mb-4">
+                                                <div class="text-center">
+                                                    <button class="btn btn-primary" type="submit" value="Submit">
+                                                        <span class="spinner-border spinner-border-sm"></span>
+                                                        กราฟ
+                                                      </button>
+                                                </div>
+                                            </div>
+                                            <input type="datetime-local" class="col-lg-5 mb-4" name="date_end" value="{{date_end}}">
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- The Modal -->
+                            <div class="modal fade" id="Modal_config">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+
+                                        <!-- Modal Header -->
+                                        <div class="modal-header">
+                                            <h4 class="modal-title">Config System</h4>
+                                            <button type="button" class="close" data-dismiss="modal">×</button>
+                                        </div>
+
+                                        <!-- Modal body -->
+                                        <form action="/main" method="POST">
+                                            <div class="modal-body">
+                                                <div class="card-body">
+                                                    <h4 class="small font-weight-bold">Data Base IP
+                                                        <input type="text" class="form-control" name="data_base_ip" value="{{data_base_ip}}">
+                                                    </h4>
+                                                    <h4 class="small font-weight-bold">Data Base Name
+                                                        <input type="text" class="form-control" name="data_base_name" value="{{data_base_name}}">
+                                                    </h4>
+                                                    <h4 class="small font-weight-bold">Sys_share_folder
+                                                        <input type="text" class="form-control" name="sys_share_folder" value="{{sys_share_folder}}">
+                                                    </h4>
+                                                    <h4 class="small font-weight-bold">Camara_ip_Snap
+                                                        <input type="text" class="form-control" name="camara_ip_01" value="{{camara_ip_01}}">
+                                                    </h4>
+                                                </div>
+                                            </div>
+
+                                            <!-- Modal footer -->
+                                            <div class="modal-footer">
+                                                <button class="btn btn-outline-primary" type="submit" value="Submit" data-toggle="modal" data-target="#Modal_config">
+                                        <span class="spinner-grow spinner-grow-sm"></span>
+                                        Save Config
+                                    </button>
+                                                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                            </div>
+                                        </form>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Color System -->
+                            <div class="row">
+                                <div class="col-lg-6 mb-4">
+                                    <div class="card bg-primary text-white shadow">
+                                        <div class="card-body">
+                                            Primary
+                                            <div class="text-white-50 small">#4e73df</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 mb-4">
+                                    <div class="card bg-success text-white shadow">
+                                        <div class="card-body">
+                                            Success
+                                            <div class="text-white-50 small">#1cc88a</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 mb-4">
+                                    <div class="card bg-info text-white shadow">
+                                        <div class="card-body">
+                                            Info
+                                            <div class="text-white-50 small">#36b9cc</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 mb-4">
+                                    <div class="card bg-warning text-white shadow">
+                                        <div class="card-body">
+                                            Warning
+                                            <div class="text-white-50 small">#f6c23e</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 mb-4">
+                                    <div class="card bg-danger text-white shadow">
+                                        <div class="card-body">
+                                            Danger
+                                            <div class="text-white-50 small">#e74a3b</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 mb-4">
+                                    <div class="card bg-secondary text-white shadow">
+                                        <div class="card-body">
+                                            Secondary
+                                            <div class="text-white-50 small">#858796</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 mb-4">
+                                    <div class="card bg-light text-black shadow">
+                                        <div class="card-body">
+                                            Light
+                                            <div class="text-black-50 small">#f8f9fc</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 mb-4">
+                                    <div class="card bg-dark text-white shadow">
+                                        <div class="card-body">
+                                            Dark
+                                            <div class="text-white-50 small">#5a5c69</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-4 mb-4">
+
+                            <!-- Illustrations -->
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">รายการข้อมูล</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="container">
+                                        <table class="table" id="log_table">
+                                            <thead>
+                                                <tr>
+                                                    <th>รายการ</th>
+                                                    <th>เวลา</th>
+                                                    <th>ช่องทาง</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="text-center">
+                                        <img class="img-fluid px-3 px-sm-4 mt-3 mb-4" style="width: 25rem;" src="/static/img/undraw_posting_photo.svg" alt="">
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; Your Website 2020</span>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="login.html">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- config_model Modal-->
+    <div class="modal fade" id="config_model" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">โปรดใช้ความระมัดระวังในการตั้งค่าระบบ?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">การตั้งค่าผิดพลาดอาจทำให้ระบบเก็บข้อมูลมีความผิดพลาดได้</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">ยกเลิก</button>
+                    <a class="btn btn-primary" href="/config_system">ยอมรับ</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="/static/vendor/jquery/jquery.min.js"></script>
+    <script src="/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="/static/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="/static/js/sb-admin-2.min.js"></script>
+
+    <!-- Page level plugins -->
+    <script src="/static/vendor/chart.js/Chart.min.js"></script>
+    <script lang="javascript" src="/static/js/xlsx.full.min.js"></script>
+    <script>
+        var chart = new Chart(document.getElementById("line-chart"), {
+            type: 'line',
+            data: {
+                labels: {{x_line | safe}},
+                datasets: [{
+                    data: {{y_line01 | safe}},
+                    label: "ทางเข้า:1 = {{t_gate_01}}",
+                    borderColor: "#3e95cd",
+                    fill: false
+                }, {
+                    data: {{y_line02 | safe}},
+                    label: "ทางเข้า:2 = {{t_gate_02}}",
+                    borderColor: "#8e5ea2",
+                    fill: false
+                }, {
+                    data: {{y_line03 | safe}},
+                    label: "ยอดรวม({{t_gate}})",
+                    borderColor: "#3cba9f",
+                    fill: true
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'รายงานจำนวนคนใช้บริการ'
+                }
+            }
+        });
+
+        document.getElementById("downloadExcel").addEventListener("click", function() {
+            downloadAsExcel({
+                filename: "chart-data",
+                chart: chart
+            })
+        });
+
+        function downloadAsExcel(args) {
+            var dataPoints, filename;
+            filename = args.filename || 'chart-data';
+
+            x_line = args.chart.data.labels;
+            y_line = args.chart.data.datasets;
+
+            dataPoints = []
+
+            row = {
+                x: "DateTime",
+                y0: y_line[0].label,
+                y1: y_line[1].label,
+                y2: y_line[2].label
+            };
+            console.log(row);
+            dataPoints.push(row);
+
+            for (i = 0; i < x_line.length; i++) {
+                row = {
+                    x: x_line[i],
+                    y0: y_line[0].data[i],
+                    y1: y_line[1].data[i],
+                    y2: y_line[2].data[i]
+                };
+                console.log(row);
+                dataPoints.push(row);
+            }
+
+            var ws = XLSX.utils.json_to_sheet(dataPoints, {
+                skipHeader: true,
+                dateNF: 'YYYYMMDD HH:mm:ss'
+            });
+            if (!ws['!cols']) ws['!cols'] = [];
+            ws['!cols'][0] = {
+                wch: 17
+            };
+            var wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, filename);
+            XLSX.writeFile(wb, filename + ".xlsx");
+        }
+    </script>
+</body>
+
+</html>
