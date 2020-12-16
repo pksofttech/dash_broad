@@ -3,7 +3,7 @@ from flask import Flask
 import os
 app = Flask(__name__)
 port = int(os.environ.get('PORT', 5000))
-print("RUN TEST")
+print("RUN TEST Port : {}".format(port))
 @app.route("/")
 def hello():
     return "Hello World!"
