@@ -16,8 +16,6 @@ import socket
 import os
 import time
 import threading
-import serial
-import serial.tools.list_ports
 from pprint import pprint
 import random
 import queue
