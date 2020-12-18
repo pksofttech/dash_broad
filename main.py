@@ -16,6 +16,8 @@ import socket
 import os
 import time
 import threading
+import serial
+import serial.tools.list_ports
 from pprint import pprint
 import random
 import queue
@@ -249,7 +251,7 @@ def call_back_server(**kwarg):
             res = transDB.select_trans(
                 "SELECT COUNT(transID) FROM Trans WHERE transGATE='Gate_02';")
             server.send_message("gate_02={}".format(res[0][0]))
-            gate_01_count = res[0][0]
+            gate_02_count = res[0][0]
 
         return 1
 
@@ -257,9 +259,8 @@ def call_back_server(**kwarg):
 def start_server():
     global server
     if(server is None):
-        _port  = int(os.environ.get('PORT', 5000))
-        #_port = 80
-        server = ServerThread(device_name, syslog=syslog, call_back=call_back_server, port=_port)
+        server = ServerThread(device_name, syslog=syslog,
+                              call_back=call_back_server)
         server.start()
     else:
         print("Server Is Running")
@@ -271,7 +272,6 @@ def stop_server():
     server.shutdown()
 
     server = None
-
 
 def restart():
     import sys
