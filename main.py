@@ -1,26 +1,19 @@
 #!/usr/bin/python
 import time
 from Server_Service import ServerThread
-from multiprocessing import Process
 from datetime import datetime
 import configparser
-import subprocess
 from datetime import date, datetime, timedelta
-from email import header
 import sqlite3
 import sys
 import logging
 import logging.handlers
 import socket
-#import netifaces as ni
 import os
 import time
 import threading
-import serial
-import serial.tools.list_ports
 from pprint import pprint
-import random
-import queue
+
 
 """Load configuration from .ini file."""
 
