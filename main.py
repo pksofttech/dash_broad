@@ -252,8 +252,8 @@ def call_back_server(**kwarg):
 def start_server():
     global server
     if(server is None):
-        server = ServerThread(device_name, syslog=syslog,
-                              call_back=call_back_server)
+        port = int(os.environ.get('PORT', 5000))
+        server = ServerThread(device_name, syslog=syslog, call_back=call_back_server, port=port)
         server.start()
     else:
         print("Server Is Running")
