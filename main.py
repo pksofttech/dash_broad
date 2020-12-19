@@ -253,6 +253,7 @@ def start_server():
     global server
     if(server is None):
         port = int(os.environ.get('PORT', 5000))
+        print('PORT USE = {}'.format(port))
         server = ServerThread(device_name, syslog=syslog, call_back=call_back_server, port=port)
         server.start()
     else:
