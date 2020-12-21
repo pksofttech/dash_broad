@@ -45,7 +45,7 @@ class sqlite_trans():
                 transDate = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             sql = "INSERT INTO Trans(transID, transDate, transGATE) VALUES ({}, '{}', '{}')".format(
                 result, transDate, transGATE)
-            print("SQL > {}".format(sql))
+            #print("SQL > {}".format(sql))
             cursor.execute(sql)
             res = cursor.lastrowid
             conn.commit()
@@ -302,13 +302,13 @@ if __name__ == '__main__':
     _gate = ["Gate_01",'Gate_02']
     for i in range(2000):
         transDB.insert_trans(transGATE=random.choice(_gate),transDate=a)
-        a = a + timedelta(0,random.randint(60,300))
-    cursor = sqlite3.connect('data.db').cursor()
-    cursor.execute("SELECT * FROM Trans")
-    rows = cursor.fetchall()
-    for row in rows:
-        print(row)
-        
+        a = a + timedelta(0,random.randint(360,3600))
+    #cursor = sqlite3.connect('data.db').cursor()
+    #cursor.execute("SELECT * FROM Trans")
+    #rows = cursor.fetchall()
+    #for row in rows:
+    #    print(row)
+
     res = transDB.select_trans(
         "SELECT COUNT(transID) FROM Trans WHERE transGATE='Gate_01';")
     gate_01_count = res[0][0]
