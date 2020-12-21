@@ -302,7 +302,7 @@ if __name__ == '__main__':
     _gate = ["Gate_01",'Gate_02']
     for i in range(2000):
         transDB.insert_trans(transGATE=random.choice(_gate),transDate=a)
-        a = a + timedelta(0,random.randint(360,3600))
+        a = a + timedelta(0,random.randint(3600,36000))
     #cursor = sqlite3.connect('data.db').cursor()
     #cursor.execute("SELECT * FROM Trans")
     #rows = cursor.fetchall()
