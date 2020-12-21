@@ -300,9 +300,9 @@ if __name__ == '__main__':
     print("GEN DATA TEST")
     a = datetime(2020, 1, 1)
     _gate = ["Gate_01",'Gate_02']
-    for i in range(2000):
+    for i in range(5000):
         transDB.insert_trans(transGATE=random.choice(_gate),transDate=a)
-        a = a + timedelta(0,random.randint(3600,36000))
+        a = a + timedelta(0,random.randint(3600,6000))
     #cursor = sqlite3.connect('data.db').cursor()
     #cursor.execute("SELECT * FROM Trans")
     #rows = cursor.fetchall()
