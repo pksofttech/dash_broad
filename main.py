@@ -13,6 +13,7 @@ import os
 import time
 import threading
 from pprint import pprint
+import random
 
 
 """Load configuration from .ini file."""
@@ -100,8 +101,8 @@ transDB = sqlite_trans('data.db')
 
 sqlite_db = sqlite3.connect('data.db').cursor()
 # ! Drop Table
-#sqlite_db.execute("drop table if exists Trans")
-#print("Table 'member_card' Drop successfully")
+sqlite_db.execute("drop table if exists Trans")
+print("Table 'member_card' Drop successfully")
 
 sqlite_db.execute('''create table if not exists Trans
          (transID               INTEGER PRIMARY KEY,
@@ -296,19 +297,18 @@ coin_status = ""
 if __name__ == '__main__':
 
     print("--------------------------------------------------------------")
-    #print("GEN DATA TEST")
-    #a = datetime(2020, 12, 1)
-    #_gate = ["Gate_01",'Gate_02']
-    # for i in range(500):
-    #    transDB.insert_trans(transGATE=random.choice(_gate),transDate=a)
-    #    a = a + timedelta(0,random.randint(60,300))
-
-    #cursor = sqlite3.connect('data.db').cursor()
-    #cursor.execute("SELECT * FROM Trans")
-    #rows = cursor.fetchall()
-    # for row in rows:
-    #    print(row)
-#
+    print("GEN DATA TEST")
+    a = datetime(2020, 1, 1)
+    _gate = ["Gate_01",'Gate_02']
+    for i in range(2000):
+        transDB.insert_trans(transGATE=random.choice(_gate),transDate=a)
+        a = a + timedelta(0,random.randint(60,300))
+    cursor = sqlite3.connect('data.db').cursor()
+    cursor.execute("SELECT * FROM Trans")
+    rows = cursor.fetchall()
+    for row in rows:
+        print(row)
+        
     res = transDB.select_trans(
         "SELECT COUNT(transID) FROM Trans WHERE transGATE='Gate_01';")
     gate_01_count = res[0][0]
