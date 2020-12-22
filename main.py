@@ -101,15 +101,15 @@ transDB = sqlite_trans('data.db')
 
 sqlite_db = sqlite3.connect('data.db').cursor()
 # ! Drop Table
-sqlite_db.execute("drop table if exists Trans")
-print("Table 'member_card' Drop successfully")
-
-sqlite_db.execute('''create table if not exists Trans
-         (transID               INTEGER PRIMARY KEY,
-         transDate              DATE,
-         transGATE              varchar(50) NOT NULL
-         );''')
-print("Table created successfully")
+#sqlite_db.execute("drop table if exists Trans")
+#print("Table 'member_card' Drop successfully")
+#
+#sqlite_db.execute('''create table if not exists Trans
+#         (transID               INTEGER PRIMARY KEY,
+#         transDate              DATE,
+#         transGATE              varchar(50) NOT NULL
+#         );''')
+#print("Table created successfully")
 
 
 # print("""
@@ -298,14 +298,19 @@ if __name__ == '__main__':
 
     print("--------------------------------------------------------------")
     print("GEN DATA TEST")
-    a = datetime(2020, 1, 1)
-    _gate = ["Gate_01",'Gate_02']
-    for i in range(10000):
-        transDB.insert_trans(transGATE=random.choice(_gate),transDate=a)
-        a = a + timedelta(0,random.randint(2000,4000))
-    #cursor = sqlite3.connect('data.db').cursor()
-    #cursor.execute("SELECT * FROM Trans")
-    #rows = cursor.fetchall()
+    #a = datetime(2020, 1, 1)
+    #_gate = ["Gate_01",'Gate_02']
+    #for i in range(15000):
+    #    transDB.insert_trans(transGATE=random.choice(_gate),transDate=a)
+    #    a = a + timedelta(0,random.randint(2000,4000))
+    #    if(i % 500 == 0):
+    #        print("Gen data 500 Record : {}".format(i))
+
+    cursor = sqlite3.connect('data.db').cursor()
+    cursor.execute("SELECT * FROM Trans")
+    rows = cursor.fetchall()
+    print("Data Record Count = {}".format(rows.__len__()))
+    cursor.close()
     #for row in rows:
     #    print(row)
 
