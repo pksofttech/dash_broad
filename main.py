@@ -317,7 +317,7 @@ def gen_data_test():
 if __name__ == '__main__':
 
     print("--------------------------------------------------------------")
-    #gen_data_test()
+    gen_data_test()
 
     cursor = sqlite3.connect('data.db').cursor()
     cursor.execute("SELECT * FROM Trans")
