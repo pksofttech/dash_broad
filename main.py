@@ -1,4 +1,3 @@
-#!/usr/bin/python
 import time
 from Server_Service import ServerThread
 from datetime import datetime
@@ -101,15 +100,7 @@ transDB = sqlite_trans('data.db')
 
 sqlite_db = sqlite3.connect('data.db').cursor()
 # ! Drop Table
-#sqlite_db.execute("drop table if exists Trans")
-#print("Table 'member_card' Drop successfully")
-#
-#sqlite_db.execute('''create table if not exists Trans
-#         (transID               INTEGER PRIMARY KEY,
-#         transDate              DATE,
-#         transGATE              varchar(50) NOT NULL
-#         );''')
-#print("Table created successfully")
+
 
 
 # print("""
@@ -138,7 +129,9 @@ sqlite_db = sqlite3.connect('data.db').cursor()
 
 _date_now = datetime.now()
 date_start = "2020-12-01T00:00"
-date_end = _date_now.strftime("%Y-%m-%dT23:59")
+
+date_end = datetime.now() + timedelta(days=1)
+#date_end = _date_now.strftime("%Y-%m-%dT23:59")
 server = None
 
 
@@ -148,12 +141,18 @@ def gen_x_line():
         _time_start = datetime.strptime(date_start, '%Y-%m-%dT%H:%M')
         _time_end = datetime.strptime(date_end, '%Y-%m-%dT%H:%M')
     except Exception as err:
-        date_start = "2020-12-01T00:00"
-        date_end = _date_now.strftime("%Y-%m-%dT23:59")
+        date_start = datetime.now()
+        date_start = date_start.strftime("%Y-%m-%dT00:00")
+        
+        date_end = datetime.now()+ timedelta(days=1)
+        date_end = date_end.strftime("%Y-%m-%dT00:00")
         _time_start = datetime.strptime(date_start, '%Y-%m-%dT%H:%M')
         _time_end = datetime.strptime(date_end, '%Y-%m-%dT%H:%M')
 
+    if(_time_start > _time_end):
+        _time_start, _time_end = (_time_end,_time_start)
     difference = _time_end - _time_start
+    
     _time_div = difference/12
 
     print(_time_start)
@@ -168,12 +167,12 @@ def gen_x_line():
     print(" COUNT ALL = {}".format(res[0][0]))
 
     _t = _time_start
-    _ret = []
-    _gate_01 = []
-    _gate_02 = []
-    _gate_all = []
+    _ret = [_t.strftime("%d-%b-%y %H:%M")]
+    _gate_01 = [0]
+    _gate_02 = [0]
+    _gate_all = [0]
     for i in range(12):
-        _ret.append(_t.strftime("%d-%b-%y %H:%M"))
+        
         sql = "SELECT COUNT(*) FROM Trans WHERE transGATE='Gate_01' AND transDate between '{}' and '{}';".format(_t, _t+_time_div)
         res = transDB.select_trans(sql)
         _gate_01.append(res[0][0])
@@ -182,10 +181,12 @@ def gen_x_line():
         res = transDB.select_trans(sql)
         _gate_02.append(res[0][0])
 
-        _gate_all.append(_gate_01[i]+_gate_02[i])
+        _gate_all.append(_gate_01[-1]+_gate_02[-1])
         print(sql)
         print("GET DATA TIME = {} - {}".format(_t, _t+_time_div))
         _t += _time_div
+        _ret.append(_t.strftime("%d-%b-%y %H:%M"))
+        
     print(_gate_all)
     return(_ret, _gate_01, _gate_02, _gate_all)
 
@@ -293,18 +294,30 @@ def ping_ip(ip):
 
 coin_status = ""
 
+def gen_data_test():
+    sqlite_db.execute("drop table if exists Trans")
+    print("Table 'member_card' Drop successfully")
+    
+    sqlite_db.execute('''create table if not exists Trans
+             (transID               INTEGER PRIMARY KEY,
+             transDate              DATE,
+             transGATE              varchar(50) NOT NULL
+             );''')
+    print("Table created successfully")
+    print("GEN DATA TEST")
+    _date_end = datetime.now()
+    _gate = ["Gate_01",'Gate_02']
+    for i in range(5000):
+        transDB.insert_trans(transGATE=random.choice(_gate),transDate=_date_end)
+        _date_end = _date_end - timedelta(minutes=random.randint(1,10))
+        
+        if(i % 500 == 0):
+            print("Gen data 500 Record : {}".format(i))
 
 if __name__ == '__main__':
 
     print("--------------------------------------------------------------")
-    print("GEN DATA TEST")
-    #a = datetime(2020, 1, 1)
-    #_gate = ["Gate_01",'Gate_02']
-    #for i in range(15000):
-    #    transDB.insert_trans(transGATE=random.choice(_gate),transDate=a)
-    #    a = a + timedelta(0,random.randint(2000,4000))
-    #    if(i % 500 == 0):
-    #        print("Gen data 500 Record : {}".format(i))
+    #gen_data_test()
 
     cursor = sqlite3.connect('data.db').cursor()
     cursor.execute("SELECT * FROM Trans")
